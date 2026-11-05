@@ -1,6 +1,6 @@
 # Trabalho Prático de Banco de Dados
 
-**Aluno:** Túlio Araújo Dutra
+**Aluno:** Tulio Araujo Dutra
 
 **RA:** 007669
 
