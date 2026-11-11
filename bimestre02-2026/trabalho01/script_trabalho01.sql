@@ -2,11 +2,7 @@
 TRABALHO PRÁTICO 01 - GESTÃO DE BANCO DE DADOS
 Tema: Sistema de gestão de uma loja de informática
 
-Justificativa e contextualização:
-O tema foi escolhido por representar um negócio comum que precisa controlar
-clientes, funcionários, produtos, pedidos e os itens vendidos em cada pedido.
-O banco permite acompanhar o estoque, registrar vendas e consultar o desempenho
-comercial da loja.
+
 
 Tabelas:
 1. clientes: armazena os dados das pessoas que realizam compras.
