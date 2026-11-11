@@ -4,20 +4,6 @@ Tema: Sistema de Gestão de uma Loja de Informática
 Aluno: Túlio Araújo Dutra
 RA: 007669
 
-Este arquivo é uma continuação do Trabalho 01.
-As funções utilizam as tabelas:
-clientes, funcionarios, categorias, produtos, pedidos e itens_pedido.
-
-ATENÇÃO:
-Execute este arquivo depois de executar o script_trabalho01.sql,
-pois as funções dependem das tabelas criadas no Trabalho 01.
-*/
-
--- =========================================================
--- FUNCTION 1: CALCULAR O VALOR TOTAL DE UM PEDIDO
--- Recebe o ID do pedido e retorna a soma dos seus itens.
--- Se o pedido não possuir itens, retorna 0.
--- =========================================================
 
 CREATE OR REPLACE FUNCTION fn_total_pedido(p_id_pedido INTEGER)
 RETURNS NUMERIC(10,2)
@@ -35,12 +21,6 @@ BEGIN
 END;
 $$;
 
-
--- =========================================================
--- FUNCTION 2: CONSULTAR A SITUAÇÃO DO ESTOQUE DE UM PRODUTO
--- Informa se o produto está sem estoque, com estoque baixo
--- (até 5 unidades) ou com estoque disponível.
--- =========================================================
 
 CREATE OR REPLACE FUNCTION fn_situacao_estoque(p_id_produto INTEGER)
 RETURNS TEXT
@@ -71,13 +51,6 @@ BEGIN
 END;
 $$;
 
-
--- =========================================================
--- FUNCTION 3: FINALIZAR UM PEDIDO
--- Confere se o pedido existe, se está ABERTO, se possui itens
--- e se há estoque suficiente. Depois baixa o estoque e altera
--- o status do pedido para PAGO.
--- =========================================================
 
 CREATE OR REPLACE FUNCTION fn_finalizar_pedido(p_id_pedido INTEGER)
 RETURNS TEXT
