@@ -1,0 +1,234 @@
+/*
+TRABALHO PRÁTICO 03 - OPERADORES E FUNÇÕES SQL
+Tema: Sistema de Gestão de uma Loja de Informática
+Aluno: Túlio Araújo Dutra
+RA: 007669
+
+-- =========================================================
+-- QUESTÃO 1 - PRECEDÊNCIA LÓGICA COM PARÊNTESES [AND, OR]
+-- Lista pedidos pagos ou enviados que também atendam a uma
+-- condição de cliente ou funcionário.
+-- Sem os parênteses, a precedência do AND sobre o OR poderia
+-- incluir pedidos pagos mesmo sem atender à segunda condição.
+-- =========================================================
+
+SELECT
+    p.id_pedido,
+    p.status,
+    c.nome AS cliente,
+    f.nome AS funcionario
+FROM pedidos p
+INNER JOIN clientes c
+    ON c.id_cliente = p.id_cliente
+INNER JOIN funcionarios f
+    ON f.id_funcionario = p.id_funcionario
+WHERE
+    (p.status = 'PAGO' OR p.status = 'ENVIADO')
+    AND (p.id_cliente <= 3 OR p.id_funcionario = 2)
+ORDER BY p.id_pedido;
+
+
+-- =========================================================
+-- QUESTÃO 2 - NEGAÇÃO E VERIFICAÇÃO DE NULOS [NOT, IS NOT NULL]
+-- Mostra clientes que não começam com a letra A e que possuem
+-- telefone cadastrado. O telefone é um campo opcional.
+-- =========================================================
+
+SELECT
+    id_cliente,
+    nome AS nome_cliente,
+    telefone
+FROM clientes
+WHERE
+    NOT (nome ILIKE 'A%')
+    AND telefone IS NOT NULL
+ORDER BY nome;
+
+
+-- =========================================================
+-- QUESTÃO 3 - INTERVALOS INCLUSIVOS E LISTAS [BETWEEN, IN]
+-- Localiza produtos com preço entre R$ 100,00 e R$ 1.000,00,
+-- inclusive, pertencentes às categorias informadas.
+-- =========================================================
+
+SELECT
+    pr.nome AS produto,
+    pr.preco,
+    cat.nome AS categoria
+FROM produtos pr
+INNER JOIN categorias cat
+    ON cat.id_categoria = pr.id_categoria
+WHERE
+    pr.preco BETWEEN 100.00 AND 1000.00
+    AND cat.nome IN ('Perifericos', 'Armazenamento', 'Componentes')
+ORDER BY pr.preco;
+
+
+-- =========================================================
+-- QUESTÃO 4A - BUSCA CASE-INSENSITIVE COM ILIKE E %
+-- Procura produtos que contenham a palavra "gamer" em qualquer
+-- posição do nome, sem diferenciar maiúsculas e minúsculas.
+-- =========================================================
+
+SELECT
+    id_produto,
+    nome AS nome_produto,
+    marca
+FROM produtos
+WHERE nome ILIKE '%gamer%'
+ORDER BY nome;
+
+
+-- =========================================================
+-- QUESTÃO 4B - CORINGA DE CARACTERE ÚNICO _
+-- Localiza nomes de produtos que tenham cinco caracteres
+-- antes do texto " Gamer", usando "_" para cada caractere.
+-- =========================================================
+
+SELECT
+    id_produto,
+    nome AS nome_produto
+FROM produtos
+WHERE nome LIKE '_____ Gamer%'
+ORDER BY nome;
+
+
+-- =========================================================
+-- QUESTÃO 5 - SIMULAÇÃO NUMÉRICA [ROUND, TRUNC]
+-- Simula um reajuste de 10% no preço dos produtos e apresenta
+-- o valor original, o valor arredondado e o valor truncado.
+-- =========================================================
+
+SELECT
+    nome AS produto,
+    preco AS preco_original,
+    ROUND(preco * 1.10, 2) AS preco_reajustado_round,
+    TRUNC(preco * 1.10, 2) AS preco_reajustado_trunc
+FROM produtos
+ORDER BY nome;
+
+
+-- =========================================================
+-- QUESTÃO 6A - CLASSIFICAÇÃO POR MÓDULO [MOD]
+-- Classifica os produtos conforme o ID: par ou ímpar.
+-- =========================================================
+
+SELECT
+    id_produto,
+    nome AS produto,
+    MOD(id_produto, 2) AS resto_divisao,
+    CASE
+        WHEN MOD(id_produto, 2) = 0 THEN 'Par'
+        ELSE 'Ímpar'
+    END AS classificacao
+FROM produtos
+ORDER BY id_produto;
+
+
+-- =========================================================
+-- QUESTÃO 6B - SORTEIO DE REGISTRO [RANDOM()]
+-- Sorteia um produto que possui estoque disponível.
+-- =========================================================
+
+SELECT
+    id_produto,
+    nome AS produto_sorteado,
+    marca,
+    estoque
+FROM produtos
+WHERE estoque > 0
+ORDER BY RANDOM()
+LIMIT 1;
+
+
+-- =========================================================
+-- QUESTÃO 7 - CONCATENAÇÃO, PADRONIZAÇÃO E EXTRAÇÃO DE TEXTO
+-- Monta uma identificação do cliente com CONCAT e COALESCE
+-- para tratar telefone nulo, padroniza o nome com UPPER e
+-- extrai a parte do e-mail anterior ao caractere @.
+-- =========================================================
+
+SELECT
+    id_cliente,
+    CONCAT(
+        nome,
+        ' - Telefone: ',
+        COALESCE(telefone, 'Não informado')
+    ) AS identificacao_cliente,
+    UPPER(nome) AS nome_em_maiusculo,
+    SPLIT_PART(email, '@', 1) AS usuario_email
+FROM clientes
+ORDER BY id_cliente;
+
+
+-- =========================================================
+-- QUESTÃO 8 - EXTRAÇÃO TEMPORAL [EXTRACT, DATE_TRUNC, INTERVAL]
+-- Exibe o ano e o mês dos pedidos e considera os pedidos
+-- registrados nos últimos 10 anos em relação à data atual.
+-- =========================================================
+
+SELECT
+    id_pedido,
+    data_pedido,
+    EXTRACT(YEAR FROM data_pedido) AS ano_pedido,
+    EXTRACT(MONTH FROM data_pedido) AS mes_pedido,
+    DATE_TRUNC('month', data_pedido) AS inicio_mes
+FROM pedidos
+WHERE data_pedido >= NOW() - INTERVAL '10 years'
+ORDER BY data_pedido DESC;
+
+
+-- =========================================================
+-- QUESTÃO 9 - TEMPO DECORRIDO E PROJEÇÃO FUTURA [AGE, NOW(), INTERVAL]
+-- Calcula há quanto tempo cada cliente foi cadastrado e
+-- projeta uma data de renovação para um ano após o cadastro.
+-- =========================================================
+
+SELECT
+    id_cliente,
+    nome AS cliente,
+    data_cadastro,
+    AGE(NOW(), data_cadastro) AS tempo_desde_cadastro,
+    data_cadastro + INTERVAL '1 year' AS data_renovacao_projetada
+FROM clientes
+ORDER BY id_cliente;
+
+
+-- =========================================================
+-- QUESTÃO 10 - RELATÓRIO GERENCIAL [INNER JOIN, TO_CHAR, LPAD]
+-- Gera um relatório dos pedidos com cliente, funcionário,
+-- data no padrão DD/MM/YYYY, total formatado e código do
+-- pedido preenchido com zeros à esquerda.
+-- =========================================================
+
+SELECT
+    LPAD(p.id_pedido::TEXT, 5, '0') AS codigo_pedido,
+    c.nome AS cliente,
+    f.nome AS funcionario,
+    p.status,
+    TO_CHAR(p.data_pedido, 'DD/MM/YYYY') AS data_pedido,
+    TO_CHAR(
+        SUM(ip.quantidade * ip.preco_unitario),
+        'FM"R$" 999G999G990D00'
+    ) AS valor_total
+FROM pedidos p
+INNER JOIN clientes c
+    ON c.id_cliente = p.id_cliente
+INNER JOIN funcionarios f
+    ON f.id_funcionario = p.id_funcionario
+INNER JOIN itens_pedido ip
+    ON ip.id_pedido = p.id_pedido
+GROUP BY
+    p.id_pedido,
+    c.nome,
+    f.nome,
+    p.status,
+    p.data_pedido
+ORDER BY p.id_pedido;
+
+
+-- =========================================================
+-- FIM DO TRABALHO PRÁTICO 03
+-- Total: 10 questões (a questão 4 e a questão 6 possuem
+-- duas consultas para demonstrar todos os recursos exigidos).
+-- =========================================================
